@@ -1,0 +1,7 @@
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/rebuild_cache.dir
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/edit_cache.dir
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/laser_detect.dir
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/rect_detect.dir
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/color_detect.dir
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/uart_test.dir
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/camera_display.dir
