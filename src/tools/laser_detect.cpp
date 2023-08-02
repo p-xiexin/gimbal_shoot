@@ -64,15 +64,19 @@ int main()
         HoughCircles(grayImage, circles, HOUGH_GRADIENT, 1, edges.rows / 8, thresh_high, vote_cnt, 1, 15);
 
         // 绘制检测到的圆
-        for (size_t i = 0; i < circles.size(); i++)
+        if (!circles.empty())
         {
-            Vec3i c = circles[i];
-            Point center = Point(c[0], c[1]);
-            int radius = c[2];
-            // // 绘制圆心
-            // circle(frame, center, 3, Scalar(0, 255, 0), -1, 8, 0);
-            // 绘制圆轮廓
-            circle(frame, center, radius, Scalar(0, 0, 255), 3, 8, 0);
+            for (size_t i = 0; i < circles.size(); i++)
+            {
+                Vec3i c = circles[i];
+                Point center = Point(c[0], c[1]);
+                int radius = c[2];
+                // // 绘制圆心
+                // circle(frame, center, 3, Scalar(0, 255, 0), -1, 8, 0);
+                // 绘制圆轮廓
+                circle(frame, center, radius, Scalar(0, 0, 255), 3, 8, 0);
+                cout << "Point " << i << ": (" << center.x << ", " << center.y << ")  ";
+            }cout << endl;
         }
 
         // 创建一个空白图像作为左右两幅图像的间隔

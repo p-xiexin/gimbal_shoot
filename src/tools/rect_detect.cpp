@@ -55,6 +55,7 @@ int main()
 
 		// 找出符合条件的矩形轮廓
 		std::vector<cv::Point> approx;
+        std::vector<std::vector<cv::Point>> rectVertices; // 存储矩形顶点坐标
 		for (size_t i = 0; i < contours.size(); i++)
 		{
 			// 使用多边形逼近来近似轮廓
@@ -73,11 +74,21 @@ int main()
                 rectangle(frame, boundingRect, Scalar(255, 0, 0), 2);
 				// 绘制矩形
 				cv::polylines(frame, approx, true, cv::Scalar(0, 255, 0), 2);
+
+                // 储存顶点坐标
+                rectVertices.push_back(approx);
 				// 绘制四个角点
 				for (size_t j = 0; j < approx.size(); j++)
 				{
 					cv::circle(frame, approx[j], 5, cv::Scalar(0, 0, 255), -1);
+                    // 输出角点坐标
+                    cout << "Point " << j << ": (" << approx[j].x << ", " << approx[j].y << ")  ";
 				}
+                // 计算矩形中心坐标并输出
+                int centerX = (approx[0].x + approx[1].x + approx[2].x + approx[3].x) / 4;
+                int centerY = (approx[0].y + approx[1].y + approx[2].y + approx[3].y) / 4;
+                cv::circle(frame, Point(centerX, centerY), 5, cv::Scalar(226, 43, 138), -1);
+                cout << "Rectangle Center: (" << centerX << ", " << centerY << ")" << endl;
 			}
 		}
 

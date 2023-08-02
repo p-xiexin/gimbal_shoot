@@ -73,13 +73,6 @@ int main(int argc, char *argv[])
         cv::vconcat(combined12, combined22, result);
 
         imshow("Result", result);
-
-        // imshow("frame", frame);
-        // imshow("binary", imageBinary);
-        // imshow("Hist", hist);
-        // imshow("Hist_b", hist_b);
-        // imshow("Hist_g", hist_g);
-        // imshow("Hist_r", hist_r);
         if(waitKey(10) == 13) break;
     }
     capture.release();
