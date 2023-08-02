@@ -3,6 +3,5 @@
 
 CMakeFiles/camera_display.dir/tools/camera_display.cpp.o: /home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
 CMakeFiles/camera_display.dir/tools/camera_display.cpp.o: /home/pxx/Documents/code/gimbal_shoot/src/include/json.hpp
-CMakeFiles/camera_display.dir/tools/camera_display.cpp.o: /home/pxx/Documents/code/gimbal_shoot/src/src/image_preprocess.cpp
 CMakeFiles/camera_display.dir/tools/camera_display.cpp.o: /home/pxx/Documents/code/gimbal_shoot/src/tools/camera_display.cpp
 

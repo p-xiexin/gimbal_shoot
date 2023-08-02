@@ -370,20 +370,6 @@ vector
 string_view
 -
 
-/home/pxx/Documents/code/gimbal_shoot/src/src/image_preprocess.cpp
-fstream
--
-iostream
--
-cmath
--
-opencv2/highgui.hpp
--
-opencv2/opencv.hpp
--
-../include/common.hpp
-/home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
-
 /home/pxx/Documents/code/gimbal_shoot/src/tools/camera_display.cpp
 fstream
 -
@@ -395,6 +381,4 @@ opencv2/opencv.hpp
 -
 ../include/common.hpp
 /home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
-../src/image_preprocess.cpp
-/home/pxx/Documents/code/gimbal_shoot/src/src/image_preprocess.cpp
 
