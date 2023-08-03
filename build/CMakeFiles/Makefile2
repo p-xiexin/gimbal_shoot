@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /home/pxx/Documents/code/gimbal_shoot/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/target.dir/all
 all: CMakeFiles/shoot.dir/all
 all: CMakeFiles/laser_detect.dir/all
 all: CMakeFiles/rect_detect.dir/all
@@ -69,6 +70,7 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/target.dir/clean
 clean: CMakeFiles/shoot.dir/clean
 clean: CMakeFiles/laser_detect.dir/clean
 clean: CMakeFiles/rect_detect.dir/clean
@@ -78,6 +80,33 @@ clean: CMakeFiles/uart_test.dir/clean
 clean: CMakeFiles/camera_display.dir/clean
 
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/target.dir
+
+# All Build rule for target.
+CMakeFiles/target.dir/all:
+	$(MAKE) -f CMakeFiles/target.dir/build.make CMakeFiles/target.dir/depend
+	$(MAKE) -f CMakeFiles/target.dir/build.make CMakeFiles/target.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles --progress-num=13,14 "Built target target"
+.PHONY : CMakeFiles/target.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/target.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/target.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles 0
+.PHONY : CMakeFiles/target.dir/rule
+
+# Convenience name for target.
+target: CMakeFiles/target.dir/rule
+
+.PHONY : target
+
+# clean rule for target.
+CMakeFiles/target.dir/clean:
+	$(MAKE) -f CMakeFiles/target.dir/build.make CMakeFiles/target.dir/clean
+.PHONY : CMakeFiles/target.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/shoot.dir
@@ -221,7 +250,7 @@ CMakeFiles/color_detect.dir/clean:
 CMakeFiles/uart_test.dir/all:
 	$(MAKE) -f CMakeFiles/uart_test.dir/build.make CMakeFiles/uart_test.dir/depend
 	$(MAKE) -f CMakeFiles/uart_test.dir/build.make CMakeFiles/uart_test.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles --progress-num=13,14 "Built target uart_test"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles --progress-num=15,16 "Built target uart_test"
 .PHONY : CMakeFiles/uart_test.dir/all
 
 # Build rule for subdir invocation for target.

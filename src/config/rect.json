@@ -1,0 +1,8 @@
+{
+    "use_otsu": true,
+    "record": [
+        {
+            "#use_otsu": "是否使用OTSU方法"
+        }
+    ]
+}

@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named target
+
+# Build rule for target.
+target: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 target
+.PHONY : target
+
+# fast build rule for target.
+target/fast:
+	$(MAKE) -f CMakeFiles/target.dir/build.make CMakeFiles/target.dir/build
+.PHONY : target/fast
+
+#=============================================================================
 # Target rules for targets named shoot
 
 # Build rule for target.
@@ -227,6 +240,33 @@ src/shoot.s: src/shoot.cpp.s
 src/shoot.cpp.s:
 	$(MAKE) -f CMakeFiles/shoot.dir/build.make CMakeFiles/shoot.dir/src/shoot.cpp.s
 .PHONY : src/shoot.cpp.s
+
+src/target.o: src/target.cpp.o
+
+.PHONY : src/target.o
+
+# target to build an object file
+src/target.cpp.o:
+	$(MAKE) -f CMakeFiles/target.dir/build.make CMakeFiles/target.dir/src/target.cpp.o
+.PHONY : src/target.cpp.o
+
+src/target.i: src/target.cpp.i
+
+.PHONY : src/target.i
+
+# target to preprocess a source file
+src/target.cpp.i:
+	$(MAKE) -f CMakeFiles/target.dir/build.make CMakeFiles/target.dir/src/target.cpp.i
+.PHONY : src/target.cpp.i
+
+src/target.s: src/target.cpp.s
+
+.PHONY : src/target.s
+
+# target to generate assembly for a file
+src/target.cpp.s:
+	$(MAKE) -f CMakeFiles/target.dir/build.make CMakeFiles/target.dir/src/target.cpp.s
+.PHONY : src/target.cpp.s
 
 tools/camera_display.o: tools/camera_display.cpp.o
 
@@ -397,6 +437,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... target"
 	@echo "... rebuild_cache"
 	@echo "... shoot"
 	@echo "... laser_detect"
@@ -408,6 +449,9 @@ help:
 	@echo "... src/shoot.o"
 	@echo "... src/shoot.i"
 	@echo "... src/shoot.s"
+	@echo "... src/target.o"
+	@echo "... src/target.i"
+	@echo "... src/target.s"
 	@echo "... tools/camera_display.o"
 	@echo "... tools/camera_display.i"
 	@echo "... tools/camera_display.s"

@@ -1,4 +1,5 @@
 /home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/edit_cache.dir
+/home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/target.dir
 /home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/rebuild_cache.dir
 /home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/shoot.dir
 /home/pxx/Documents/code/gimbal_shoot/build/CMakeFiles/laser_detect.dir

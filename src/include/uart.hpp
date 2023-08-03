@@ -4,7 +4,9 @@
 #include <libserial/SerialPort.h>
 #include <string.h>
 #include "common.hpp"
+#include <opencv2/opencv.hpp>
 
+using namespace cv;
 using namespace LibSerial;
 
 #define UsbFrameHead 0x42	 // USB通信帧头
@@ -236,6 +238,80 @@ public:
 		}
 	}
 
+	void rectControl(std::vector<cv::Point> rectPoints)
+	{
+		if(rectPoints.size() != 5)
+			return;
+
+		if(isOpen)
+		{
+			std::vector<unsigned char> sendBuff(24);
+			Bint16_Union bint16_data;
+			unsigned char check = 0;
+
+			sendBuff[0] = 0xa5; // 帧头
+			sendBuff[1] = 0x07; // 地址
+			sendBuff[2] = 24;	// 帧长
+
+			for(int i = 0; i < 5; i++)
+			{
+				bint16_data.U16 = rectPoints[i].x;
+				sendBuff[4*i + 3] = bint16_data.U8_Buff[0];
+				sendBuff[4*i + 4] = bint16_data.U8_Buff[1];
+				bint16_data.U16 = rectPoints[i].y;
+				sendBuff[4*i + 5] = bint16_data.U8_Buff[0];
+				sendBuff[4*i + 6] = bint16_data.U8_Buff[1];
+			}
+
+			for (size_t i = 0; i < 23; i++)
+			{
+				check += sendBuff[i];
+			}
+			sendBuff[23] = check;
+			send(sendBuff);
+		}
+		else
+		{
+			std::cout << "Error: Uart Open failed!!!!" << std::endl;
+		}
+	}
+
+	void circleControl(int16_t x, int16_t y)
+	{
+		if (isOpen)
+		{
+			Bint16_Union bint16_x;
+			Bint16_Union bint16_y;
+			std::vector<unsigned char> sendBuff(8);
+			unsigned char check = 0;
+
+			bint16_x.U16 = x;
+			bint16_y.U16 = y;
+
+			sendBuff[0] = 0xa5; // 帧头
+			sendBuff[1] = 0x08; // 地址
+			sendBuff[2] = 8;	// 帧长
+
+			sendBuff[3] = bint16_x.U8_Buff[0];
+			sendBuff[4] = bint16_x.U8_Buff[1];
+
+			sendBuff[5] = bint16_y.U8_Buff[0];
+			sendBuff[6] = bint16_y.U8_Buff[1];
+
+			for (size_t i = 0; i < 7; i++)
+			{
+				check += sendBuff[i];
+			}
+			sendBuff[7] = check;
+			// 发送数据
+			send(sendBuff);
+			}
+		else
+		{
+			std::cout << "Error: Uart Open failed!!!!" << std::endl;
+		}
+	}
+
 	/**
 	 * @brief 智能车速度与方向控制
 	 *
@@ -277,45 +353,6 @@ public:
 			// 	std::cout << setw(2) << setfill('0') << hex << static_cast<int>(sendBuff[i]) << "\t";
 			// }
 			// std::cout << std::endl;
-		}
-		else
-		{
-			std::cout << "Error: Uart Open failed!!!!" << std::endl;
-		}
-	}
-	/**
-	 * @brief 蜂鸣器音效
-	 *
-	 * @param sound
-	 * >  1：确认/OK
-	 * >  2：报警/Warnning
-	 * >  3：完成/Finish
-	 * >  4：提示/Ding
-	 * >  5：开机/Systemstart
-	 */
-	void buzzerSound(unsigned char sound)
-	{
-		if (isOpen)
-		{
-			unsigned char sendBuff[7];
-			unsigned char check = 0;
-
-			sendBuff[0] = 0x42;	 // 帧头
-			sendBuff[1] = 0x04;	 // 地址
-			sendBuff[2] = 5;	 // 帧长
-			sendBuff[3] = sound; // 音效
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				check += sendBuff[i];
-			}
-			sendBuff[4] = check;
-
-			// 循环发送数据
-			for (size_t i = 0; i < 7; i++)
-			{
-				send(sendBuff[i]);
-			}
 		}
 		else
 		{
@@ -389,16 +426,6 @@ public:
 		}
 
 		return 0;
-	}
-
-	float speed_unpack()
-	{
-		Bint32_Union speed;
-		speed.U8_Buff[0] = usb_Struct.receiveBuffFinished[3];
-		speed.U8_Buff[1] = usb_Struct.receiveBuffFinished[4];
-		speed.U8_Buff[2] = usb_Struct.receiveBuffFinished[5];
-		speed.U8_Buff[3] = usb_Struct.receiveBuffFinished[6];
-		return speed.Float;
 	}
 
 	void close()

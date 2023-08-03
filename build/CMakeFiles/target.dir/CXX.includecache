@@ -48,7 +48,7 @@ common.hpp
 opencv2/opencv.hpp
 -
 
-/home/pxx/Documents/code/gimbal_shoot/src/src/shoot.cpp
+/home/pxx/Documents/code/gimbal_shoot/src/src/target.cpp
 iostream
 -
 opencv2/highgui.hpp

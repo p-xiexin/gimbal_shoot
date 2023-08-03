@@ -80,16 +80,16 @@ public:
             {
                 if(_sound)
                 {
-                    _driver->buzzerSound(_sound);
+                    // _driver->buzzerSound(_sound);
                     _sound = 0;
                 }
-                // if(_ctrl)
-                // {
-                //     _driver->gimbalControl(_x_delta, _y_delta);
-                //     _ctrl = false;
-                // }
-                _driver->gimbalControl(_x_delta, _y_delta);
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                if(_ctrl)
+                {
+                    _driver->gimbalControl(_x_delta, _y_delta);
+                    _ctrl = false;
+                }
+                // _driver->gimbalControl(_x_delta, _y_delta);
+                // std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
             }
         });
@@ -104,7 +104,7 @@ public:
                 data_addr = _driver->receiveData();
                 if(data_addr == 0x08)
                 {
-                    _recvSpeed = _driver->speed_unpack();
+                    // _recvSpeed = _driver->speed_unpack();
                 }
                 else if(data_addr == 0x06)
                 {

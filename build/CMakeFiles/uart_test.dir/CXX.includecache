@@ -45,6 +45,8 @@ string.h
 -
 common.hpp
 /home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
+opencv2/opencv.hpp
+-
 
 /home/pxx/Documents/code/gimbal_shoot/src/tools/uart_test.cpp
 ../include/uart.hpp
