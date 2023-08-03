@@ -7,10 +7,19 @@ using namespace std;
 using namespace cv;
 
 int type = 1;
-int canny_low = 30, canny_high = 50;   
+int canny_low = 10, canny_high = 50;   
 int sobel_scale = 1;
 int min_height = 100, min_width = 100;
-int dilate_size = 6;
+int dilate_size = 11;
+
+// 比较函数，用于按极角从小到大排序
+bool comparePoints(cv::Point pt1, cv::Point pt2)
+{
+    cv::Point2f center(COLSIMAGE / 2.0, ROWSIMAGE / 2.0); // 图像中心点
+    double angle1 = atan2(pt1.y - center.y, pt1.x - center.x);
+    double angle2 = atan2(pt2.y - center.y, pt2.x - center.x);
+    return angle1 < angle2;
+}
 
 int main()
 {
@@ -44,7 +53,7 @@ int main()
     cv::createTrackbar("Canny Low", "Detected Rectangles", &canny_low, 255);
     cv::createTrackbar("Canny High", "Detected Rectangles", &canny_high, 255);
     cv::createTrackbar("Sobel Scale", "Detected Rectangles", &sobel_scale, 100);
-    cv::createTrackbar("Dilate Size", "Detected Rectangles", &dilate_size, 10);
+    cv::createTrackbar("Dilate Size", "Detected Rectangles", &dilate_size, 30);
 	while (1)
 	{
 		Mat frame;
@@ -89,7 +98,7 @@ int main()
 
 		// 找出符合条件的矩形轮廓
 		std::vector<cv::Point> approx;
-        std::vector<std::vector<cv::Point>> rectVertices; // 存储矩形顶点坐标
+		uint16_t counter = 0;
 		for (size_t i = 0; i < contours.size(); i++)
 		{
 			// 使用多边形逼近来近似轮廓
@@ -109,8 +118,8 @@ int main()
 				// 绘制矩形
 				cv::polylines(frame, approx, true, cv::Scalar(0, 255, 0), 2);
 
-                // 储存顶点坐标
-                rectVertices.push_back(approx);
+				std::sort(approx.begin(), approx.end(), comparePoints);
+
 				// 绘制四个角点
 				for (size_t j = 0; j < approx.size(); j++)
 				{
@@ -122,7 +131,7 @@ int main()
                 int centerX = (approx[0].x + approx[1].x + approx[2].x + approx[3].x) / 4;
                 int centerY = (approx[0].y + approx[1].y + approx[2].y + approx[3].y) / 4;
                 cv::circle(frame, Point(centerX, centerY), 5, cv::Scalar(226, 43, 138), -1);
-                cout << "Rectangle Center: (" << centerX << ", " << centerY << ")" << endl;
+                cout << "Rectangle Center: (" << centerX << ", " << centerY << ")  " << counter++ << endl;
 			}
 		}
 
@@ -165,3 +174,4 @@ int main()
 
 	return 0;
 }
+

@@ -16,6 +16,36 @@ opencv2/highgui.hpp
 opencv2/opencv.hpp
 -
 
+/home/pxx/Documents/code/gimbal_shoot/src/include/serial.hpp
+iostream
+-
+opencv2/highgui.hpp
+-
+opencv2/opencv.hpp
+-
+condition_variable
+-
+mutex
+-
+thread
+-
+chrono
+-
+uart.hpp
+/home/pxx/Documents/code/gimbal_shoot/src/include/uart.hpp
+common.hpp
+/home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
+
+/home/pxx/Documents/code/gimbal_shoot/src/include/uart.hpp
+iostream
+-
+libserial/SerialPort.h
+-
+string.h
+-
+common.hpp
+/home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
+
 /home/pxx/Documents/code/gimbal_shoot/src/tools/rect_detect.cpp
 iostream
 -
@@ -25,4 +55,6 @@ opencv2/opencv.hpp
 -
 ../include/common.hpp
 /home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
+../include/serial.hpp
+/home/pxx/Documents/code/gimbal_shoot/src/include/serial.hpp
 

@@ -41,7 +41,9 @@ target_link_libraries(${COLOR_PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
 set(HSV_PROJECT_NAME "hsv_detect")
 set(HSV_PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/tools/hsv_detect.cpp)
 add_executable(${HSV_PROJECT_NAME} ${HSV_PROJECT_SOURCES})
+target_link_libraries(${HSV_PROJECT_NAME} PRIVATE pthread )
 target_link_libraries(${HSV_PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+target_link_libraries(${HSV_PROJECT_NAME} PRIVATE serial)
 
 
 # RectDetect (矩形识别)

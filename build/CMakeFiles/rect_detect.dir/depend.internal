@@ -3,4 +3,6 @@
 
 CMakeFiles/rect_detect.dir/tools/rect_detect.cpp.o
  /home/pxx/Documents/code/gimbal_shoot/src/include/common.hpp
+ /home/pxx/Documents/code/gimbal_shoot/src/include/serial.hpp
+ /home/pxx/Documents/code/gimbal_shoot/src/include/uart.hpp
  /home/pxx/Documents/code/gimbal_shoot/src/tools/rect_detect.cpp

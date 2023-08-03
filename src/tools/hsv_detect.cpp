@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp> //OpenCV终端部署
 #include <opencv2/opencv.hpp>  //OpenCV终端部署
 #include "../include/common.hpp"	//公共类方法文件
+#include "../include/serial.hpp"
 
 using namespace std;
 using namespace cv;
@@ -11,8 +12,8 @@ std::vector<cv::Rect> searchBlocks(cv::Mat img_rgb, cv::Mat &mask, cv::Scalar lo
 void onTrackbar(int, void*);
 
 int kernel_size = 4;
-int min_height = 3, min_width = 3;
-int max_height = 20, max_width = 20;
+int min_size = 3;
+int max_size = 30;
 // 红色色块
 int r_lowB = 140, r_lowG = 0, r_lowR = 132;
 int r_highB = 180, r_highG = 255, r_highR = 255;
@@ -28,10 +29,16 @@ cv::Scalar upperThreshold_g(g_highB, g_highG, g_highR);
 
 bool colorThresholdSelected = true;
 
+SerialInterface serialInterface("/dev/ttyACM0", LibSerial::BaudRate::BAUD_115200);
 int main(int argc, char const *argv[])
 {
-	
-	Mat image;
+    // 下位机初始化通信
+    int ret = serialInterface.open();
+    if (ret != 0)
+        return 0;
+	serialInterface.Start();
+
+
 	std::string indexCapture = "/dev/video0";
 	VideoCapture capture("/dev/video0");
 	if (!capture.isOpened())
@@ -71,21 +78,22 @@ int main(int argc, char const *argv[])
 
     cv::namedWindow("Result");
     cv::createTrackbar("Kernel Size: ", "Result", &kernel_size, 10, onTrackbar);
-    cv::createTrackbar("Min Height: ", "Result", &min_height, 20, onTrackbar);
-    cv::createTrackbar("Min Width: ", "Result", &min_width, 20, onTrackbar);
-    cv::createTrackbar("Max Height: ", "Result", &max_height, 20, onTrackbar);
-    cv::createTrackbar("Max Width: ", "Result", &max_width, 20, onTrackbar);
+    cv::createTrackbar("Min Size: ", "Result", &min_size, 50, onTrackbar);
+    cv::createTrackbar("Max Size: ", "Result", &max_size, 50, onTrackbar);
 
 
 	while (1)
 	{
-		{
-			static auto preTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-			auto startTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-			float detFPS = (float)1000.f / (startTime - preTime);
-			std::cout << "run frame time : " << startTime - preTime << "ms  " << "FPS: " << (int)detFPS << std::endl;
-			preTime = startTime;
-		}
+		std::vector<cv::Point> points_red;
+		std::vector<cv::Point> points_green;
+
+		// {
+		// 	static auto preTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+		// 	auto startTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+		// 	float detFPS = (float)1000.f / (startTime - preTime);
+		// 	std::cout << "run frame time : " << startTime - preTime << "ms  " << "FPS: " << (int)detFPS << std::endl;
+		// 	preTime = startTime;
+		// }
 		Mat frame;
 		if (!capture.read(frame))
 		{
@@ -99,19 +107,35 @@ int main(int argc, char const *argv[])
 			std::vector<cv::Rect> coneRects_red = searchBlocks(frame, mask_red, lowerThreshold_r, upperThreshold_r);
 			for(const auto& rect : coneRects_red)
 			{
-				if(rect.height > min_height && rect.height < max_height && rect.width > min_width && rect.width < max_width)
+				if(rect.height > min_size && rect.height < max_size && rect.width > min_size && rect.width < max_size)
 				{
+					points_red.push_back(cv::Point(rect.x + rect.width / 2, rect.y + rect.height / 2));
 					cv::rectangle(frame, rect, cv::Scalar(0, 0, 255), 2);
 				}
 			}
 			std::vector<cv::Rect> coneRects_green = searchBlocks(frame, mask_green, lowerThreshold_g, upperThreshold_g);
 			for(const auto& rect : coneRects_green)
 			{
-				if(rect.height > min_height && rect.height < max_height && rect.width > min_width && rect.width < max_width)
+				if(rect.height > min_size && rect.height < max_size && rect.width > min_size && rect.width < max_size)
 				{
+					points_green.push_back(cv::Point(rect.x + rect.width / 2, rect.y + rect.height / 2));
 					cv::rectangle(frame, rect, cv::Scalar(0, 255, 0), 2);
 				}
 			}
+
+			if(points_red.size() == 1 && points_green.size() == 1)
+			{
+				int16_t delta_x = (int16_t)points_red[0].x - (int16_t)points_green[0].x;
+				int16_t delta_y = (int16_t)points_red[0].y - (int16_t)points_green[0].y;
+                std::cout << "(" << points_red[0].x << ", " << points_red[0].y << ")  ";
+                std::cout << "(" << points_green[0].x << ", " << points_green[0].y << ")  ";
+                std::cout << "X_Delta: " << delta_x << "  Y_Delta: " << delta_y << std::endl;
+
+				serialInterface.set_control(delta_x, delta_y);
+			}
+			else
+				serialInterface.set_control(0, 0);
+
 			cv::imshow("Result", frame);
         	cv::imshow("Red Threshold Settings", mask_red);
         	cv::imshow("Green Threshold Settings", mask_green);
@@ -132,10 +156,8 @@ int main(int argc, char const *argv[])
 			cv::setTrackbarPos("High V", "Green  Threshold Settings", g_highR);
 
 			cv::setTrackbarPos("Kernel Size: ", "Result", kernel_size);
-			cv::setTrackbarPos("Min Height: ", "Result", min_height);
-			cv::setTrackbarPos("Min Width: ", "Result", min_width);
-			cv::setTrackbarPos("Max Height: ", "Result", max_height);
-			cv::setTrackbarPos("Max Width: ", "Result", max_width);
+			cv::setTrackbarPos("Min Size: ", "Result", min_size);
+			cv::setTrackbarPos("Max Size: ", "Result", max_size);
 		}
 		else
 		{
