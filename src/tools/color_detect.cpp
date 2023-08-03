@@ -2,8 +2,6 @@
 #include <iostream>
 #include <opencv2/highgui.hpp> //OpenCV终端部署
 #include <opencv2/opencv.hpp>  //OpenCV终端部署
-#include <signal.h>
-#include <unistd.h>
 #include "../include/common.hpp"	//公共类方法文件
 
 using namespace std;

@@ -254,12 +254,6 @@ public:
 			bint16_x.U16 = x_delta;
 			bint16_y.U16 = y_delta;
 
-			// if (servoPwm > PWMSERVOMAX)
-			//   servoPwm = PWMSERVOMAX;
-			// else if (servoPwm < PWMSERVOMIN)
-			//   servoPwm = PWMSERVOMIN;
-			// bint16_Union.U16 = servoPwm;
-
 			sendBuff[0] = 0xa5; // 帧头
 			sendBuff[1] = 0x02; // 地址
 			sendBuff[2] = 8;	// 帧长
@@ -275,14 +269,14 @@ public:
 				check += sendBuff[i];
 			}
 			sendBuff[7] = check;
-			for (size_t i = 0; i < 8; i++)
-			{
-				std::cout << setw(2) << setfill('0') << hex << static_cast<int>(sendBuff[i]) << "\t";
-			}
-			std::cout << std::endl;
-
 			// 发送数据
 			send(sendBuff);
+			
+			// for (size_t i = 0; i < 8; i++)
+			// {
+			// 	std::cout << setw(2) << setfill('0') << hex << static_cast<int>(sendBuff[i]) << "\t";
+			// }
+			// std::cout << std::endl;
 		}
 		else
 		{

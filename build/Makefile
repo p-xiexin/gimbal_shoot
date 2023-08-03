@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/pxx/Documents/code/gimbal_shoot/build
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -109,6 +109,19 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
+
+#=============================================================================
+# Target rules for targets named shoot
+
+# Build rule for target.
+shoot: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 shoot
+.PHONY : shoot
+
+# fast build rule for target.
+shoot/fast:
+	$(MAKE) -f CMakeFiles/shoot.dir/build.make CMakeFiles/shoot.dir/build
+.PHONY : shoot/fast
 
 #=============================================================================
 # Target rules for targets named laser_detect
@@ -174,6 +187,33 @@ camera_display: cmake_check_build_system
 camera_display/fast:
 	$(MAKE) -f CMakeFiles/camera_display.dir/build.make CMakeFiles/camera_display.dir/build
 .PHONY : camera_display/fast
+
+src/shoot.o: src/shoot.cpp.o
+
+.PHONY : src/shoot.o
+
+# target to build an object file
+src/shoot.cpp.o:
+	$(MAKE) -f CMakeFiles/shoot.dir/build.make CMakeFiles/shoot.dir/src/shoot.cpp.o
+.PHONY : src/shoot.cpp.o
+
+src/shoot.i: src/shoot.cpp.i
+
+.PHONY : src/shoot.i
+
+# target to preprocess a source file
+src/shoot.cpp.i:
+	$(MAKE) -f CMakeFiles/shoot.dir/build.make CMakeFiles/shoot.dir/src/shoot.cpp.i
+.PHONY : src/shoot.cpp.i
+
+src/shoot.s: src/shoot.cpp.s
+
+.PHONY : src/shoot.s
+
+# target to generate assembly for a file
+src/shoot.cpp.s:
+	$(MAKE) -f CMakeFiles/shoot.dir/build.make CMakeFiles/shoot.dir/src/shoot.cpp.s
+.PHONY : src/shoot.cpp.s
 
 tools/camera_display.o: tools/camera_display.cpp.o
 
@@ -316,13 +356,17 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... rebuild_cache"
+	@echo "... shoot"
 	@echo "... laser_detect"
 	@echo "... rect_detect"
 	@echo "... color_detect"
 	@echo "... uart_test"
 	@echo "... camera_display"
+	@echo "... src/shoot.o"
+	@echo "... src/shoot.i"
+	@echo "... src/shoot.s"
 	@echo "... tools/camera_display.o"
 	@echo "... tools/camera_display.i"
 	@echo "... tools/camera_display.s"

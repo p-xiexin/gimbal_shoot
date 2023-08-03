@@ -1,6 +1,5 @@
 #pragma once
 
-#include "json.hpp"
 #include <fstream>
 #include <iostream>
 #include <opencv2/highgui.hpp>
@@ -11,13 +10,11 @@ using namespace std;
 using namespace cv;
 
 
-#define COLSIMAGE 320    // 图像的列数
-#define ROWSIMAGE 240    // 图像的行数
-#define COLSIMAGEIPM 320 // IPM图像的列数
-#define ROWSIMAGEIPM 400 // IPM图像的行数
-#define PWMSERVOMAX 1850 // 舵机PWM最大值（左）1850
-#define PWMSERVOMID 1500 // 舵机PWM中值 1500
-#define PWMSERVOMIN 1150 // 舵机PWM最小值（右）1150
+#define COLSIMAGE 640    // 图像的列数
+#define ROWSIMAGE 480    // 图像的行数
+// #define COLSIMAGEIPM 320 // IPM图像的列数
+// #define ROWSIMAGEIPM 400 // IPM图像的行数
+// #define PWMSERVOMAX 1850 // 舵机PWM最大值（左）1850
 
 struct POINT
 {

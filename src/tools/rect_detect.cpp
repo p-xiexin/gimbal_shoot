@@ -6,6 +6,11 @@
 using namespace std;
 using namespace cv;
 
+int type = 0;
+int canny_low = 50, canny_high = 150;
+int sobel_scale = 1;
+int min_height = 100, min_width = 100;
+
 int main()
 {
 	Mat image;
@@ -30,7 +35,13 @@ int main()
 			  << " height = " << height << " exposure = " << exposure << " ms" << std::endl;
 
     cv::namedWindow("Detected Rectangles");
-
+    // 创建滑块
+    cv::createTrackbar("Type", "Detected Rectangles", &type, 2);
+    cv::createTrackbar("Canny Low", "Detected Rectangles", &canny_low, 255);
+    cv::createTrackbar("Canny High", "Detected Rectangles", &canny_high, 255);
+    cv::createTrackbar("Sobel Scale", "Detected Rectangles", &sobel_scale, 100);
+    cv::createTrackbar("Min Height", "Detected Rectangles", &min_height, ROWSIMAGE);
+    cv::createTrackbar("Min Width", "Detected Rectangles", &min_width, COLSIMAGE);
 	while (1)
 	{
 		Mat frame;
@@ -46,8 +57,24 @@ int main()
 
 		// 对灰度图像进行边缘检测
 		cv::Mat edges;
-		// cv::Canny(grayImage, edges, 50, 150);
-        cv::threshold(grayImage, edges, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+		if(type == 1)
+		{
+			cv::Canny(grayImage, edges, canny_low, canny_high);
+            putText(frame, "Canny", Point(40, 40), FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 255), 1);
+		}
+		else if(type == 2)
+		{
+			cv::Sobel(frame, edges, -1, 1, 1, 3, sobel_scale);
+            putText(frame, "Sobel", Point(40, 40), FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 255), 1);
+		}
+		else if(type == 0)
+		{
+			cv::threshold(grayImage, edges, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+            putText(frame, "OTSU", Point(40, 40), FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 255), 1);
+		}
+
+		if(edges.channels() > 1)
+			cv::cvtColor(edges, edges, cv::COLOR_BGR2GRAY);
 
 		// 查找轮廓
 		std::vector<std::vector<cv::Point>> contours;
@@ -67,7 +94,7 @@ int main()
                 // 获取轮廓的外接矩形
                 Rect boundingRect = cv::boundingRect(approx);
 
-                if(boundingRect.height < 40 || boundingRect.width < 40 || boundingRect.height > ROWSIMAGE - 10 || boundingRect.width > COLSIMAGE - 10)
+                if(boundingRect.height < min_height || boundingRect.width < min_width || boundingRect.height > ROWSIMAGE - 10 || boundingRect.width > COLSIMAGE - 10)
                     continue;
 
                 // 绘制外接矩形
@@ -93,17 +120,39 @@ int main()
 		}
 
 		// 显示结果
+        // // 将 edges 转换为3通道图像
+        // cv::Mat edges_color;
+        // cv::cvtColor(edges, edges_color, cv::COLOR_GRAY2BGR);
+
+        // // 将combined1和edges图像水平拼接
+        // cv::Mat combined;
+        // cv::hconcat(frame, edges_color, combined);
+
+        // 创建一个空白图像作为左右两幅图像的间隔
+        cv::Mat blank = cv::Mat::zeros(frame.rows, 10, CV_8UC3);
+
+        // 将滑动条和frame图像水平拼接
+        cv::Mat combined1;
+        cv::hconcat(frame, blank, combined1);
+
         // 将 edges 转换为3通道图像
         cv::Mat edges_color;
         cv::cvtColor(edges, edges_color, cv::COLOR_GRAY2BGR);
 
         // 将combined1和edges图像水平拼接
-        cv::Mat combined;
-        cv::hconcat(frame, edges_color, combined);
+        cv::Mat combined2;
+        cv::hconcat(combined1, edges_color, combined2);
 
         // 显示结果
-        cv::imshow("Detected Rectangles", combined);
+        cv::imshow("Detected Rectangles", combined2);
 		if(waitKey(5) == 13) break;
+
+		cv::setTrackbarPos("Type", "Detected Rectangles", type);
+		cv::setTrackbarPos("Canny Low", "Detected Rectangles", canny_low);
+		cv::setTrackbarPos("Canny High", "Detected Rectangles", canny_high);
+		cv::setTrackbarPos("Sobel Scale", "Detected Rectangles", sobel_scale);
+		cv::setTrackbarPos("Min Height", "Detected Rectangles", min_height);
+		cv::setTrackbarPos("Min Width", "Detected Rectangles", min_width);
 	}
 
 	return 0;

@@ -1,0 +1,12 @@
+{
+    "kernel_size": 6,
+    "thresh_high": 150,
+    "vote_cnt": 10,
+    "record": [
+        {
+            "#kernel_size": "闭运算滤波核大小",
+            "#thresh_high": "Canny算子高阈值",
+            "#vote_cnt": "Hough变换检测圆最小投票数"
+        }
+    ]
+}

@@ -51,6 +51,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/shoot.dir/DependInfo.cmake"
   "CMakeFiles/laser_detect.dir/DependInfo.cmake"
   "CMakeFiles/rect_detect.dir/DependInfo.cmake"
   "CMakeFiles/color_detect.dir/DependInfo.cmake"
