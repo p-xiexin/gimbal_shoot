@@ -18,21 +18,21 @@ int main(int argc, char *argv[])
         std::cout << "can not open video device " << std::endl;
         return 1;
     }
-    capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-    capture.set(cv::CAP_PROP_FPS, 30);
-    capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
-    capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
+    // capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+    // capture.set(cv::CAP_PROP_FPS, 30);
+    // capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
+    // capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
+	// capture.set(cv::CAP_PROP_ZOOM, 15);
+	// capture.set(cv::CAP_PROP_EXPOSURE, 0.005);
     //capture.set(cv::CAP_PROP_AUTO_EXPOSURE, 0.20);  //自动曝光开关
-    // capture.set(cv::CAP_PROP_ZOOM, 14);
-    // capture.set(cv::CAP_PROP_PAN, 20);
-    // capture.set(cv::CAP_PROP_XI_OFFSET_X, 1);
-    // capture.set(cv::CAP_PROP_XI_OFFSET_Y, 1);
 
     double rate = capture.get(CAP_PROP_FPS);
     double width = capture.get(CAP_PROP_FRAME_WIDTH);
     double height = capture.get(CAP_PROP_FRAME_HEIGHT);
+    double exposure = capture.get(CAP_PROP_EXPOSURE);
     std::cout << "Camera Param: frame rate = " << rate << " width = " << width
-              << " height = " << height << std::endl;
+              << " height = " << height << " exposure = " << exposure << " ms" << std::endl;
+
 
     while (1)
     {

@@ -9,6 +9,7 @@ using namespace cv;
 int kernel_size = 3;    // 滤波核大小
 int thresh_high = 150;  // canny边缘检测的高阈值
 int vote_cnt = 10;      // 确定检测到圆的最小投票数
+int min_radius = 1, max_radius = 10;
 
 int main()
 {
@@ -21,10 +22,11 @@ int main()
         return 1;
     }
     capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-    capture.set(cv::CAP_PROP_FPS, 30);
+    capture.set(cv::CAP_PROP_FPS, 60);
     capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
     capture.set(cv::CAP_PROP_EXPOSURE, 0.015);
+	capture.set(cv::CAP_PROP_ZOOM, 15);
 
     double rate = capture.get(CAP_PROP_FPS);
     double width = capture.get(CAP_PROP_FRAME_WIDTH);
@@ -37,7 +39,9 @@ int main()
     // 创建滑块
     cv::createTrackbar("Kernel Size", "Params Setting", &kernel_size, 10);
     cv::createTrackbar("Thresh High", "Params Setting", &thresh_high, 200);
-    cv::createTrackbar("Vote Cnt", "Params Setting", &vote_cnt, 20);
+    cv::createTrackbar("Vote Cnt", "Params Setting", &vote_cnt, 50);
+    cv::createTrackbar("Min Radius", "Params Setting", &min_radius, 20);
+    cv::createTrackbar("Max Radius", "Params Setting", &max_radius, 20);
 
     while (1)
     {
@@ -61,7 +65,7 @@ int main()
 
         // 使用霍夫变换检测圆
         vector<Vec3f> circles;
-        HoughCircles(grayImage, circles, HOUGH_GRADIENT, 1, edges.rows / 8, thresh_high, vote_cnt, 1, 15);
+        HoughCircles(grayImage, circles, HOUGH_GRADIENT, 1, edges.rows / 8, thresh_high, vote_cnt, min_radius, max_radius);
 
         // 绘制检测到的圆
         if (!circles.empty())
@@ -102,6 +106,8 @@ int main()
         cv::setTrackbarPos("Kernel Size", "Params Setting", kernel_size);
         cv::setTrackbarPos("Thresh High", "Params Setting", thresh_high);
         cv::setTrackbarPos("Vote Cnt", "Params Setting", vote_cnt);
+        cv::setTrackbarPos("Min Radius", "Params Setting", min_radius);
+        cv::setTrackbarPos("Max Radius", "Params Setting", max_radius);
     }
 
     return 0;

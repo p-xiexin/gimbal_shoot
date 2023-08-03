@@ -10,6 +10,7 @@ int type = 0;
 int canny_low = 50, canny_high = 150;
 int sobel_scale = 1;
 int min_height = 100, min_width = 100;
+int dilate_size = 1;
 
 int main()
 {
@@ -22,10 +23,11 @@ int main()
 		return 1;
 	}
 	capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-	capture.set(cv::CAP_PROP_FPS, 30);
+	capture.set(cv::CAP_PROP_FPS, 60);
 	capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
 	capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
 	capture.set(cv::CAP_PROP_EXPOSURE, 0.015);
+	capture.set(cv::CAP_PROP_ZOOM, 15);
 
 	double rate = capture.get(CAP_PROP_FPS);
 	double width = capture.get(CAP_PROP_FRAME_WIDTH);
@@ -37,11 +39,12 @@ int main()
     cv::namedWindow("Detected Rectangles");
     // 创建滑块
     cv::createTrackbar("Type", "Detected Rectangles", &type, 2);
+    cv::createTrackbar("Min Height", "Detected Rectangles", &min_height, ROWSIMAGE);
+    cv::createTrackbar("Min Width", "Detected Rectangles", &min_width, COLSIMAGE);
     cv::createTrackbar("Canny Low", "Detected Rectangles", &canny_low, 255);
     cv::createTrackbar("Canny High", "Detected Rectangles", &canny_high, 255);
     cv::createTrackbar("Sobel Scale", "Detected Rectangles", &sobel_scale, 100);
-    cv::createTrackbar("Min Height", "Detected Rectangles", &min_height, ROWSIMAGE);
-    cv::createTrackbar("Min Width", "Detected Rectangles", &min_width, COLSIMAGE);
+    cv::createTrackbar("Dilate Size", "Detected Rectangles", &dilate_size, 10);
 	while (1)
 	{
 		Mat frame;
@@ -54,6 +57,7 @@ int main()
 		// 转换为灰度图像
 		cv::Mat grayImage;
 		cv::cvtColor(frame, grayImage, cv::COLOR_BGR2GRAY);
+		cv::GaussianBlur(grayImage, grayImage, cv::Size(5, 5), 0, 0);
 
 		// 对灰度图像进行边缘检测
 		cv::Mat edges;
@@ -75,6 +79,9 @@ int main()
 
 		if(edges.channels() > 1)
 			cv::cvtColor(edges, edges, cv::COLOR_BGR2GRAY);
+
+		cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(dilate_size, dilate_size));//创建结构元
+		cv::morphologyEx(edges, edges, cv::MORPH_DILATE, kernel, cv::Point(-1, -1));//闭运算
 
 		// 查找轮廓
 		std::vector<std::vector<cv::Point>> contours;
@@ -153,6 +160,7 @@ int main()
 		cv::setTrackbarPos("Sobel Scale", "Detected Rectangles", sobel_scale);
 		cv::setTrackbarPos("Min Height", "Detected Rectangles", min_height);
 		cv::setTrackbarPos("Min Width", "Detected Rectangles", min_width);
+		cv::setTrackbarPos("Dilate Size", "Detected Rectangles", dilate_size);
 	}
 
 	return 0;

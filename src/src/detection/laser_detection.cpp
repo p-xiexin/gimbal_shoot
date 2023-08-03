@@ -55,7 +55,7 @@ public:
 
         // 使用霍夫变换检测圆
         std::vector<cv::Vec3f> circles;
-        cv::HoughCircles(img, circles, cv::HOUGH_GRADIENT, 1, img.rows / 8, params.thresh_high, params.vote_cnt, 1, 15);
+        cv::HoughCircles(img, circles, cv::HOUGH_GRADIENT, 1, img.rows / 8, params.thresh_high, params.vote_cnt, params.min_radius, params.max_radius);
 
         if (!circles.empty())
         {
@@ -202,7 +202,9 @@ private:
         uint16_t kernel_size = 3;
         uint16_t thresh_high = 150;
         uint16_t vote_cnt = 10;
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(Params, kernel_size, thresh_high, vote_cnt); // 添加构造函数
+        uint16_t min_radius = 10;
+        uint16_t max_radius = 10;
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(Params, kernel_size, thresh_high, vote_cnt, min_radius, max_radius); // 添加构造函数
     };
     Params params;
 };

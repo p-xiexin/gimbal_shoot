@@ -1,12 +1,17 @@
 {
-    "kernel_size": 6,
+    "kernel_size": 5,
     "thresh_high": 150,
-    "vote_cnt": 10,
+    "vote_cnt": 14,
+    "min_radius": 1,
+    "max_radius": 10,
     "record": [
         {
             "#kernel_size": "闭运算滤波核大小",
             "#thresh_high": "Canny算子高阈值",
-            "#vote_cnt": "Hough变换检测圆最小投票数"
+            "#vote_cnt": "Hough变换检测圆最小投票数",
+            "#min_radius": "Hough变换检测圆最小半径",
+            "#max_radius": "Hough变换检测圆最大半径",
+            "#dilate_size": "膨胀半径"
         }
     ]
 }
