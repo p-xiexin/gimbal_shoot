@@ -54,6 +54,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/shoot.dir/DependInfo.cmake"
   "CMakeFiles/laser_detect.dir/DependInfo.cmake"
   "CMakeFiles/rect_detect.dir/DependInfo.cmake"
+  "CMakeFiles/hsv_detect.dir/DependInfo.cmake"
   "CMakeFiles/color_detect.dir/DependInfo.cmake"
   "CMakeFiles/uart_test.dir/DependInfo.cmake"
   "CMakeFiles/camera_display.dir/DependInfo.cmake"

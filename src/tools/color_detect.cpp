@@ -7,19 +7,24 @@
 using namespace std;
 using namespace cv;
 
-std::vector<cv::Rect> searchCones(cv::Mat img_rgb);
+std::vector<cv::Rect> searchBlocks(cv::Mat img_rgb, cv::Mat &mask, cv::Scalar lowerThreshold, cv::Scalar upperThreshold);
 void onTrackbar(int, void*);
 
+int kernel_size = 4;
+int min_height = 3, min_width = 3;
+int max_height = 20, max_width = 20;
 // 红色色块
-int lowB = 76, lowG = 76, lowR = 117;
-int highB = 156, highG = 156, highR = 255;
-int kernel_size = 6;
+int r_lowB = 170, r_lowG = 170, r_lowR = 235;
+int r_highB = 255, r_highG = 255, r_highR = 255;
+cv::Scalar lowerThreshold_r(r_lowB, r_lowG, r_lowR);
+cv::Scalar upperThreshold_r(r_highB, r_highG, r_highR);
 
-// 设置锥桶颜色的RGB范围（黄色）
-// cv::Scalar lowerThreshold(0, 100, 100);
-// cv::Scalar upperThreshold(100, 255, 255);
-cv::Scalar lowerThreshold(0, 0, 100);
-cv::Scalar upperThreshold(100, 100, 255);
+// 绿色色块
+int g_lowB = 165, g_lowG = 230, g_lowR = 170;
+int g_highB = 255, g_highG = 255, g_highR = 255;
+cv::Scalar lowerThreshold_g(g_lowB, g_lowG, g_lowR);
+cv::Scalar upperThreshold_g(g_highB, g_highG, g_highR);
+
 
 bool colorThresholdSelected = true;
 
@@ -48,104 +53,132 @@ int main(int argc, char const *argv[])
 			<< " height = " << height << " exposure = " << exposure << " ms" << std::endl;
 
 
-    // 创建一个空白图像作为"Threshold Settings"窗口的背景
-    cv::Mat thresholdSettings = cv::Mat::ones(1, 480, CV_8UC3) * 255;
-    // 创建“Threshold Settings”窗口
-    cv::namedWindow("Threshold Settings");
-	cv::resizeWindow("Threshold Settings", 1, 480); // 设置窗口大小为200x1像素
-	cv::moveWindow("Threshold Settings", 0, 0); // 移动"Threshold Settings"窗口到图像结果窗口的上方    // 创建“Result”窗口
+    cv::namedWindow("Red Threshold Settings");
+    cv::createTrackbar("Low B", "Red Threshold Settings", &r_lowB, 255, onTrackbar);
+    cv::createTrackbar("Low G", "Red Threshold Settings", &r_lowG, 255, onTrackbar);
+    cv::createTrackbar("Low R", "Red Threshold Settings", &r_lowR, 255, onTrackbar);
+    cv::createTrackbar("High B", "Red Threshold Settings", &r_highB, 255, onTrackbar);
+    cv::createTrackbar("High G", "Red Threshold Settings", &r_highG, 255, onTrackbar);
+    cv::createTrackbar("High R", "Red Threshold Settings", &r_highR, 255, onTrackbar);
+
+	cv::namedWindow("Green Threshold Settings");
+    cv::createTrackbar("Low B", "Green Threshold Settings", &g_lowB, 255, onTrackbar);
+    cv::createTrackbar("Low G", "Green Threshold Settings", &g_lowG, 255, onTrackbar);
+    cv::createTrackbar("Low R", "Green Threshold Settings", &g_lowR, 255, onTrackbar);
+    cv::createTrackbar("High B", "Green Threshold Settings", &g_highB, 255, onTrackbar);
+    cv::createTrackbar("High G", "Green Threshold Settings", &g_highG, 255, onTrackbar);
+    cv::createTrackbar("High R", "Green Threshold Settings", &g_highR, 255, onTrackbar);
+
     cv::namedWindow("Result");
-    // 为BGR通道创建滑块
-    cv::createTrackbar("Low B", "Threshold Settings", &lowB, 255, onTrackbar);
-    cv::createTrackbar("Low G", "Threshold Settings", &lowG, 255, onTrackbar);
-    cv::createTrackbar("Low R", "Threshold Settings", &lowR, 255, onTrackbar);
-    cv::createTrackbar("High B", "Threshold Settings", &highB, 255, onTrackbar);
-    cv::createTrackbar("High G", "Threshold Settings", &highG, 255, onTrackbar);
-    cv::createTrackbar("High R", "Threshold Settings", &highR, 255, onTrackbar);
-    cv::createTrackbar("Kernel Size", "Threshold Settings", &kernel_size, 10, onTrackbar);
+    cv::createTrackbar("Kernel Size: ", "Result", &kernel_size, 10, onTrackbar);
+    cv::createTrackbar("Min Height: ", "Result", &min_height, 20, onTrackbar);
+    cv::createTrackbar("Min Width: ", "Result", &min_width, 20, onTrackbar);
+    cv::createTrackbar("Max Height: ", "Result", &max_height, 20, onTrackbar);
+    cv::createTrackbar("Max Width: ", "Result", &max_width, 20, onTrackbar);
 
 
 	while (1)
 	{
-		
+		{
+			static auto preTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+			auto startTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+			float detFPS = (float)1000.f / (startTime - preTime);
+			std::cout << "run frame time : " << startTime - preTime << "ms  " << "FPS: " << (int)detFPS << std::endl;
+			preTime = startTime;
+		}
 		Mat frame;
 		if (!capture.read(frame))
 		{
 			std::cout << "no video frame" << std::endl;
 			continue;
 		}
-		Mat image_cone = frame.clone();
+		Mat mask_red, mask_green;
 
 		if(colorThresholdSelected)
 		{
-			std::vector<cv::Rect> coneRects = searchCones(image_cone);
-			for(const auto& rect : coneRects)
+			std::vector<cv::Rect> coneRects_red = searchBlocks(frame, mask_red, lowerThreshold_r, upperThreshold_r);
+			for(const auto& rect : coneRects_red)
 			{
-				cv::rectangle(image_cone, rect, cv::Scalar(0, 255, 0), 2);
-				circle(image_cone, Point(rect.x + rect.width / 2, rect.y + rect.height / 2), 5, Scalar(200, 200, 200), -1);
+				if(rect.height > min_height && rect.height < max_height && rect.width > min_width && rect.width < max_width)
+				{
+					cv::rectangle(frame, rect, cv::Scalar(0, 0, 255), 2);
+				}
 			}
+			std::vector<cv::Rect> coneRects_green = searchBlocks(frame, mask_green, lowerThreshold_g, upperThreshold_g);
+			for(const auto& rect : coneRects_green)
 			{
-				static auto preTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-				auto startTime = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-				float detFPS = (float)1000.f / (startTime - preTime);
-				std::cout << "run frame time : " << startTime - preTime << "ms  " << "FPS: " << (int)detFPS << "  num: " << coneRects.size() << std::endl;
-				preTime = startTime;
+				if(rect.height > min_height && rect.height < max_height && rect.width > min_width && rect.width < max_width)
+				{
+					cv::rectangle(frame, rect, cv::Scalar(0, 255, 0), 2);
+				}
 			}
-			cv::imshow("Result", image_cone);
-        	cv::imshow("Threshold Settings", thresholdSettings);
+			cv::imshow("Result", frame);
+        	cv::imshow("Red Threshold Settings", mask_red);
+        	cv::imshow("Green Threshold Settings", mask_green);
 			if(waitKey(5) == 13) break;
 			// 更新滑块显示的当前值
-			cv::setTrackbarPos("Low B", "Threshold Settings", lowB);
-			cv::setTrackbarPos("Low G", "Threshold Settings", lowG);
-			cv::setTrackbarPos("Low R", "Threshold Settings", lowR);
-			cv::setTrackbarPos("High B", "Threshold Settings", highB);
-			cv::setTrackbarPos("High G", "Threshold Settings", highG);
-			cv::setTrackbarPos("High R", "Threshold Settings", highR);
-			cv::setTrackbarPos("Kernel Size", "Threshold Settings", kernel_size);
+			cv::setTrackbarPos("Low B", "Red Threshold Settings", r_lowB);
+			cv::setTrackbarPos("Low G", "Red Threshold Settings", r_lowG);
+			cv::setTrackbarPos("Low R", "Red Threshold Settings", r_lowR);
+			cv::setTrackbarPos("High B", "Red Threshold Settings", r_highB);
+			cv::setTrackbarPos("High G", "Red Threshold Settings", r_highG);
+			cv::setTrackbarPos("High R", "Red Threshold Settings", r_highR);
+
+			cv::setTrackbarPos("Low B", "Green  Threshold Settings", g_lowB);
+			cv::setTrackbarPos("Low G", "Green  Threshold Settings", g_lowG);
+			cv::setTrackbarPos("Low R", "Green  Threshold Settings", g_lowR);
+			cv::setTrackbarPos("High B", "Green  Threshold Settings", g_highB);
+			cv::setTrackbarPos("High G", "Green  Threshold Settings", g_highG);
+			cv::setTrackbarPos("High R", "Green  Threshold Settings", g_highR);
+
+			cv::setTrackbarPos("Kernel Size: ", "Result", kernel_size);
+			cv::setTrackbarPos("Min Height: ", "Result", min_height);
+			cv::setTrackbarPos("Min Width: ", "Result", min_width);
+			cv::setTrackbarPos("Max Height: ", "Result", max_height);
+			cv::setTrackbarPos("Max Width: ", "Result", max_width);
 		}
 		else
 		{
 			// 绘制方框在图像中心
-            int centerX = image_cone.cols / 2;
-            int centerY = image_cone.rows / 2;
+            int centerX = frame.cols / 2;
+            int centerY = frame.rows / 2;
             int boxSize = 20; // 方框的大小
             cv::Rect boxRect(centerX - boxSize / 2, centerY - boxSize / 2, boxSize, boxSize);
 
             // 在方框内提取颜色阈值参
-            cv::Mat boxROI = image_cone(boxRect);
+            cv::Mat boxROI = frame(boxRect);
             cv::Scalar meanColor = cv::mean(boxROI);
-            cv::rectangle(image_cone, boxRect, cv::Scalar(0, 255, 0), 2);
+            cv::rectangle(frame, boxRect, cv::Scalar(0, 255, 0), 2);
 
 			// 绘制颜色阈值提示框在图像中心左下方
-			int roiX = image_cone.cols / 2 - 10;
-			int roiY = image_cone.rows / 2 + 10;
+			int roiX = frame.cols / 2 - 10;
+			int roiY = frame.rows / 2 + 10;
 			cv::Rect roiRect(roiX- boxSize / 2, roiY - boxSize / 2, boxSize, boxSize);
-			cv::rectangle(image_cone, roiRect, cv::Scalar(meanColor[0], meanColor[1], meanColor[2]), -1);
+			cv::rectangle(frame, roiRect, cv::Scalar(meanColor[0], meanColor[1], meanColor[2]), -1);
 
-            cv::imshow("Select Color Threshold", image_cone);
+            cv::imshow("Select Color Threshold", frame);
 			if(cv::waitKey(5) == 13)
 			{
 				// 设置锥桶颜色的RGB范围
-				lowerThreshold = cv::Scalar(meanColor[0] - 10, meanColor[1] - 50, meanColor[2] - 50);
-				upperThreshold = cv::Scalar(meanColor[0] + 10, meanColor[1] + 50, meanColor[2] + 50);
+				lowerThreshold_r = cv::Scalar(meanColor[0] - 10, meanColor[1] - 50, meanColor[2] - 50);
+				upperThreshold_r = cv::Scalar(meanColor[0] + 10, meanColor[1] + 50, meanColor[2] + 50);
 				colorThresholdSelected = true;
-				cout << "Selected Thresholds: " << lowerThreshold << " - " << upperThreshold << endl;
+				cout << "Selected Thresholds: " << lowerThreshold_r << " - " << upperThreshold_r << endl;
 			}
 		}
 	}
 	return 0;
 }
 
-std::vector<cv::Rect> searchCones(cv::Mat img_rgb)
+std::vector<cv::Rect> searchBlocks(cv::Mat img_rgb, cv::Mat &mask, cv::Scalar lowerThreshold, cv::Scalar upperThreshold)
 {
 	std::vector<cv::Rect> coneRects;
 
 	// 在RGB图像中根据颜色范围提取锥桶区域
-	cv::Mat mask;
 	cv::inRange(img_rgb, lowerThreshold, upperThreshold, mask);
 
 	// 进行形态学操作，去除噪声并提取锥桶区域的轮廓
-	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernel_size, kernel_size));
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(kernel_size, kernel_size));
 	cv::morphologyEx(mask, mask, cv::MORPH_OPEN, kernel);
 
 	std::vector<std::vector<cv::Point>> contours;
@@ -176,6 +209,8 @@ std::vector<cv::Rect> searchCones(cv::Mat img_rgb)
 void onTrackbar(int, void*)
 {
     // 从滑块更新阈值参数
-    lowerThreshold = cv::Scalar(lowB, lowG, lowR);
-    upperThreshold = cv::Scalar(highB, highG, highR);
+    lowerThreshold_r = cv::Scalar(r_lowB, r_lowG, r_lowR);
+    upperThreshold_r = cv::Scalar(r_highB, r_highG, r_highR);
+	lowerThreshold_g = cv::Scalar(g_lowB, g_lowG, g_lowR);
+    upperThreshold_g = cv::Scalar(g_highB, g_highG, g_highR);
 }

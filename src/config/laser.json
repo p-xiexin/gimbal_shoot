@@ -1,4 +1,5 @@
 {
+    "use_hough": true,
     "kernel_size": 5,
     "thresh_high": 150,
     "vote_cnt": 14,
@@ -6,6 +7,7 @@
     "max_radius": 10,
     "record": [
         {
+            "#use_hough": "是否使用Hough圆检测",
             "#kernel_size": "闭运算滤波核大小",
             "#thresh_high": "Canny算子高阈值",
             "#vote_cnt": "Hough变换检测圆最小投票数",

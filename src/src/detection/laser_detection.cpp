@@ -199,12 +199,13 @@ private:
      */
     struct Params
     {
+        bool use_hough = true;
         uint16_t kernel_size = 3;
         uint16_t thresh_high = 150;
         uint16_t vote_cnt = 10;
         uint16_t min_radius = 10;
         uint16_t max_radius = 10;
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(Params, kernel_size, thresh_high, vote_cnt, min_radius, max_radius); // 添加构造函数
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(Params, use_hough, kernel_size, thresh_high, vote_cnt, min_radius, max_radius); // 添加构造函数
     };
     Params params;
 };

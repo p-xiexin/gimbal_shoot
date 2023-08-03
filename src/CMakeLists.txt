@@ -37,6 +37,13 @@ set(COLOR_PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/tools/color_detect.cpp)
 add_executable(${COLOR_PROJECT_NAME} ${COLOR_PROJECT_SOURCES})
 target_link_libraries(${COLOR_PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
 
+# HSVDetect (色块识别)
+set(HSV_PROJECT_NAME "hsv_detect")
+set(HSV_PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/tools/hsv_detect.cpp)
+add_executable(${HSV_PROJECT_NAME} ${HSV_PROJECT_SOURCES})
+target_link_libraries(${HSV_PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+
+
 # RectDetect (矩形识别)
 set(RECT_PROJECT_NAME "rect_detect")
 set(RECT_PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/tools/rect_detect.cpp)

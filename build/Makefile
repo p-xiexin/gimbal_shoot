@@ -150,6 +150,19 @@ rect_detect/fast:
 .PHONY : rect_detect/fast
 
 #=============================================================================
+# Target rules for targets named hsv_detect
+
+# Build rule for target.
+hsv_detect: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 hsv_detect
+.PHONY : hsv_detect
+
+# fast build rule for target.
+hsv_detect/fast:
+	$(MAKE) -f CMakeFiles/hsv_detect.dir/build.make CMakeFiles/hsv_detect.dir/build
+.PHONY : hsv_detect/fast
+
+#=============================================================================
 # Target rules for targets named color_detect
 
 # Build rule for target.
@@ -269,6 +282,33 @@ tools/color_detect.cpp.s:
 	$(MAKE) -f CMakeFiles/color_detect.dir/build.make CMakeFiles/color_detect.dir/tools/color_detect.cpp.s
 .PHONY : tools/color_detect.cpp.s
 
+tools/hsv_detect.o: tools/hsv_detect.cpp.o
+
+.PHONY : tools/hsv_detect.o
+
+# target to build an object file
+tools/hsv_detect.cpp.o:
+	$(MAKE) -f CMakeFiles/hsv_detect.dir/build.make CMakeFiles/hsv_detect.dir/tools/hsv_detect.cpp.o
+.PHONY : tools/hsv_detect.cpp.o
+
+tools/hsv_detect.i: tools/hsv_detect.cpp.i
+
+.PHONY : tools/hsv_detect.i
+
+# target to preprocess a source file
+tools/hsv_detect.cpp.i:
+	$(MAKE) -f CMakeFiles/hsv_detect.dir/build.make CMakeFiles/hsv_detect.dir/tools/hsv_detect.cpp.i
+.PHONY : tools/hsv_detect.cpp.i
+
+tools/hsv_detect.s: tools/hsv_detect.cpp.s
+
+.PHONY : tools/hsv_detect.s
+
+# target to generate assembly for a file
+tools/hsv_detect.cpp.s:
+	$(MAKE) -f CMakeFiles/hsv_detect.dir/build.make CMakeFiles/hsv_detect.dir/tools/hsv_detect.cpp.s
+.PHONY : tools/hsv_detect.cpp.s
+
 tools/laser_detect.o: tools/laser_detect.cpp.o
 
 .PHONY : tools/laser_detect.o
@@ -361,6 +401,7 @@ help:
 	@echo "... shoot"
 	@echo "... laser_detect"
 	@echo "... rect_detect"
+	@echo "... hsv_detect"
 	@echo "... color_detect"
 	@echo "... uart_test"
 	@echo "... camera_display"
@@ -373,6 +414,9 @@ help:
 	@echo "... tools/color_detect.o"
 	@echo "... tools/color_detect.i"
 	@echo "... tools/color_detect.s"
+	@echo "... tools/hsv_detect.o"
+	@echo "... tools/hsv_detect.i"
+	@echo "... tools/hsv_detect.s"
 	@echo "... tools/laser_detect.o"
 	@echo "... tools/laser_detect.i"
 	@echo "... tools/laser_detect.s"

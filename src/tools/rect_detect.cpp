@@ -6,11 +6,11 @@
 using namespace std;
 using namespace cv;
 
-int type = 0;
-int canny_low = 50, canny_high = 150;
+int type = 1;
+int canny_low = 30, canny_high = 50;   
 int sobel_scale = 1;
 int min_height = 100, min_width = 100;
-int dilate_size = 1;
+int dilate_size = 6;
 
 int main()
 {
