@@ -83,13 +83,13 @@ public:
                     _driver->buzzerSound(_sound);
                     _sound = 0;
                 }
-                if(_ctrl)
-                {
-                    _driver->gimbalControl(_x_delta, _y_delta);
-                    _ctrl = false;
-                }
-                // _driver->carControl(speed, servo_pwm);
-                // std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                // if(_ctrl)
+                // {
+                //     _driver->gimbalControl(_x_delta, _y_delta);
+                //     _ctrl = false;
+                // }
+                _driver->gimbalControl(_x_delta, _y_delta);
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
             }
         });

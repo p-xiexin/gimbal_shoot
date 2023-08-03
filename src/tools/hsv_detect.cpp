@@ -32,6 +32,9 @@ bool colorThresholdSelected = true;
 SerialInterface serialInterface("/dev/ttyACM0", LibSerial::BaudRate::BAUD_115200);
 int main(int argc, char const *argv[])
 {
+    uint16_t counterRunBegin = 1;              // 启动计数器：等待摄像头图像帧稳定
+
+
     // 下位机初始化通信
     int ret = serialInterface.open();
     if (ret != 0)
@@ -123,18 +126,23 @@ int main(int argc, char const *argv[])
 				}
 			}
 
-			if(points_red.size() == 1 && points_green.size() == 1)
+			if(counterRunBegin > 30)
 			{
-				int16_t delta_x = (int16_t)points_red[0].x - (int16_t)points_green[0].x;
-				int16_t delta_y = (int16_t)points_red[0].y - (int16_t)points_green[0].y;
-                std::cout << "(" << points_red[0].x << ", " << points_red[0].y << ")  ";
-                std::cout << "(" << points_green[0].x << ", " << points_green[0].y << ")  ";
-                std::cout << "X_Delta: " << delta_x << "  Y_Delta: " << delta_y << std::endl;
+				if(points_red.size() == 1 && points_green.size() == 1)
+				{
+					int16_t delta_x = (int16_t)points_red[0].x - (int16_t)points_green[0].x;
+					int16_t delta_y = (int16_t)points_red[0].y - (int16_t)points_green[0].y;
+					std::cout << "(" << points_red[0].x << ", " << points_red[0].y << ")  ";
+					std::cout << "(" << points_green[0].x << ", " << points_green[0].y << ")  ";
+					std::cout << "X_Delta: " << delta_x << "  Y_Delta: " << delta_y << std::endl;
 
-				serialInterface.set_control(delta_x, delta_y);
+					serialInterface.set_control(delta_x, delta_y);
+				}
+				else
+					serialInterface.set_control(0, 0);
 			}
-			else
-				serialInterface.set_control(0, 0);
+			else 
+				counterRunBegin++;
 
 			cv::imshow("Result", frame);
         	cv::imshow("Red Threshold Settings", mask_red);
