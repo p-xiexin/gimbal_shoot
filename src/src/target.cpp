@@ -12,6 +12,8 @@ int canny_low = 10, canny_high = 50;
 int sobel_scale = 1;
 int min_height = 120, min_width = 120;
 int dilate_size = 11;
+int erode_size = 3;
+float scale = 0.95, zero_offset = -0.02f;
 
 int kernel_size = 1;
 int min_size = 1;
@@ -30,6 +32,21 @@ bool comparePoints(cv::Point pt1, cv::Point pt2)
     double angle1 = atan2(pt1.y - center.y, pt1.x - center.x);
     double angle2 = atan2(pt2.y - center.y, pt2.x - center.x);
     return angle1 < angle2;
+}
+
+std::vector<cv::Point> resizeRect(std::vector<cv::Point> rect, float k, float offset)
+{
+	std::vector<cv::Point> resize(5);
+	for(int i = 0; i < 5; i++)
+	{
+		resize[i].x = rect[i].x * k + rect[4].x * (1 - k);
+		resize[i].y = rect[i].y * k + rect[4].y * (1 - k);
+	}
+	k += offset;
+	resize[0].x = rect[0].x * k + rect[4].x * (1 - k);
+	resize[0].y = rect[0].y * k + rect[4].y * (1 - k);
+
+	return resize;
 }
 
 shared_ptr<Driver> driver = nullptr;
@@ -52,8 +69,7 @@ int main()
 		return -1;
 	}
 
-	std::string indexCapture = "/dev/video0";
-	VideoCapture capture("/dev/video0");
+	VideoCapture capture("/dev/video1");
 	if (!capture.isOpened())
 	{
 		std::cout << "can not open video device " << std::endl;
@@ -131,11 +147,11 @@ int main()
 			cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(dilate_size, dilate_size));//创建结构元
 			cv::morphologyEx(edges, edges, cv::MORPH_DILATE, kernel, cv::Point(-1, -1));//闭运算
 		}
-		// else if(type == 0)
-		// {
-		// 	cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));//创建结构元
-		// 	cv::morphologyEx(edges, edges, cv::MORPH_ERODE, kernel, cv::Point(-1, -1));//闭运算
-		// }
+		else if(type == 0)
+		{
+			cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(erode_size, erode_size));//创建结构元
+			cv::morphologyEx(edges, edges, cv::MORPH_ERODE, kernel, cv::Point(-1, -1));//闭运算
+		}
 
 		// 查找轮廓
 		std::vector<std::vector<cv::Point>> contours;
@@ -171,7 +187,7 @@ int main()
 				{
 					cv::circle(img_color, approx[j], 5, cv::Scalar(0, 0, 255), -1);
                     // 输出角点坐标
-                    cout << "Point " << j << ": (" << approx[j].x << ", " << approx[j].y << ")  ";
+                    // cout << "Point " << j << ": (" << approx[j].x << ", " << approx[j].y << ")  ";
 				}
                 // 计算矩形中心坐标并输出
                 int centerX = (approx[0].x + approx[1].x + approx[2].x + approx[3].x) / 4;
@@ -185,7 +201,9 @@ int main()
 					rectPoints.push_back(approx[2]);
 					rectPoints.push_back(approx[3]);
 					rectPoints.push_back(cv::Point(centerX, centerY));
-					driver->rectControl(rectPoints);
+					std::vector<cv::Point> resizePoints = resizeRect(rectPoints, scale, zero_offset);
+					// driver->rectControl(rectPoints);
+					driver->rectControl(resizePoints);
 				}
 			}
 		}

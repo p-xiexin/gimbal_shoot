@@ -11,6 +11,7 @@ int canny_low = 10, canny_high = 50;
 int sobel_scale = 1;
 int min_height = 100, min_width = 100;
 int dilate_size = 11;
+int erode_size = 3;
 
 // 比较函数，用于按极角从小到大排序
 bool comparePoints(cv::Point pt1, cv::Point pt2)
@@ -54,6 +55,7 @@ int main()
     cv::createTrackbar("Canny High", "Detected Rectangles", &canny_high, 255);
     cv::createTrackbar("Sobel Scale", "Detected Rectangles", &sobel_scale, 100);
     cv::createTrackbar("Dilate Size", "Detected Rectangles", &dilate_size, 30);
+    cv::createTrackbar("Erode Size", "Detected Rectangles", &erode_size, 30);
 	while (1)
 	{
 		Mat frame;
@@ -89,8 +91,16 @@ int main()
 		if(edges.channels() > 1)
 			cv::cvtColor(edges, edges, cv::COLOR_BGR2GRAY);
 
-		cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(dilate_size, dilate_size));//创建结构元
-		cv::morphologyEx(edges, edges, cv::MORPH_DILATE, kernel, cv::Point(-1, -1));//闭运算
+		if(type != 0)
+		{
+			cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(dilate_size, dilate_size));//创建结构元
+			cv::morphologyEx(edges, edges, cv::MORPH_DILATE, kernel, cv::Point(-1, -1));//闭运算
+		}
+		else if(type == 0)
+		{
+			cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(erode_size, erode_size));//创建结构元
+			cv::morphologyEx(edges, edges, cv::MORPH_ERODE, kernel, cv::Point(-1, -1));//闭运算
+		}
 
 		// 查找轮廓
 		std::vector<std::vector<cv::Point>> contours;
@@ -170,6 +180,7 @@ int main()
 		cv::setTrackbarPos("Min Height", "Detected Rectangles", min_height);
 		cv::setTrackbarPos("Min Width", "Detected Rectangles", min_width);
 		cv::setTrackbarPos("Dilate Size", "Detected Rectangles", dilate_size);
+		cv::setTrackbarPos("Erode Size", "Detected Rectangles", erode_size);
 	}
 
 	return 0;
