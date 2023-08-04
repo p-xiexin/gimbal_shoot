@@ -12,9 +12,9 @@ std::vector<cv::Rect> searchBlocks(cv::Mat img_rgb, cv::Mat &mask, cv::Scalar lo
 void onTrackbar(int, void*);
 
 int kernel_size = 1;
-int min_size = 2;
+int min_size = 1;
 int max_size = 30;
-float exposure = 0.008;
+float exposure = 60;
 // 红色色块
 int r_lowH = 140, r_lowS = 0, r_lowV = 132;
 int r_highH = 180, r_highS = 255, r_highV = 255;
@@ -27,7 +27,7 @@ int g_highH = 94, g_highS = 255, g_highV = 255;
 cv::Scalar lowerThreshold_g(g_lowH, g_lowS, g_lowV);
 cv::Scalar upperThreshold_g(g_highH, g_highS, g_highV);
 
-SerialInterface serialInterface("/dev/ttyACM0", LibSerial::BaudRate::BAUD_115200);
+SerialInterface serialInterface("/dev/ttyUSB0", LibSerial::BaudRate::BAUD_115200);
 int main(int argc, char const *argv[])
 {
     uint16_t counterRunBegin = 1;              // 启动计数器：等待摄像头图像帧稳定
@@ -108,11 +108,21 @@ int main(int argc, char const *argv[])
 				std::cout << "(" << points_red[0].x << ", " << points_red[0].y << ")  ";
 				std::cout << "(" << points_green[0].x << ", " << points_green[0].y << ")  ";
 				std::cout << "X_Delta: " << delta_x << "  Y_Delta: " << delta_y << std::endl;
-
+				circle(frame, Point(50, 40), 8, Scalar(0, 0, 255), -1);
+				circle(frame, Point(80, 40), 8, Scalar(0, 255, 0), -1);
 				serialInterface.set_control(delta_x, delta_y);
 			}
-			else
+			else if(points_red.size() == 1)
+			{
+				circle(frame, Point(50, 40), 8, Scalar(0, 0, 255), -1);
 				serialInterface.set_control(0, 0);
+			}
+			else if(points_green.size() == 1)
+			{
+				circle(frame, Point(80, 40), 8, Scalar(0, 255, 0), -1);
+				serialInterface.set_control(0, 0);
+			}
+				//serialInterface.set_control(0, 0);
 		}
 		else 
 			counterRunBegin++;

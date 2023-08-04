@@ -54,8 +54,8 @@ int main()
 {
     uint16_t counterRunBegin = 1;              // 启动计数器：等待摄像头图像帧稳定
 
-	// driver = std::make_shared<Driver>("/dev/ttyUSB0", BaudRate::BAUD_115200);
-	driver = std::make_shared<Driver>("/dev/ttyACM0", BaudRate::BAUD_115200);
+	driver = std::make_shared<Driver>("/dev/ttyUSB0", BaudRate::BAUD_115200);
+	// driver = std::make_shared<Driver>("/dev/ttyACM0", BaudRate::BAUD_115200);
 	if (driver == nullptr)
 	{
 		std::cout << "Create uart-driver error!" << std::endl;
@@ -69,7 +69,7 @@ int main()
 		return -1;
 	}
 
-	VideoCapture capture("/dev/video1");
+	VideoCapture capture("/dev/video0");
 	if (!capture.isOpened())
 	{
 		std::cout << "can not open video device " << std::endl;
@@ -79,7 +79,7 @@ int main()
 	capture.set(cv::CAP_PROP_FPS, 60);
 	capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
 	capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
-	capture.set(cv::CAP_PROP_EXPOSURE, 0.010);
+	capture.set(cv::CAP_PROP_EXPOSURE, 100);
 	capture.set(cv::CAP_PROP_ZOOM, 15);
 
 	double rate = capture.get(CAP_PROP_FPS);
@@ -208,7 +208,7 @@ int main()
 			}
 		}
 
-        cv::imshow("Detected Rectangles", img_color);
+        // cv::imshow("Detected Rectangles", img_color);
 		if(waitKey(5) == 13) break;
 	}
 
