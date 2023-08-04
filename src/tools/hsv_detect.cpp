@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
     capture.set(cv::CAP_PROP_FPS, 30);
     capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
-	capture.set(cv::CAP_PROP_EXPOSURE, 0.015);
+	capture.set(cv::CAP_PROP_EXPOSURE, 0.01);
 	
 	double rate = capture.get(CAP_PROP_FPS);
 	double width = capture.get(CAP_PROP_FRAME_WIDTH);

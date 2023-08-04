@@ -10,7 +10,7 @@ using namespace cv;
 int type = 1;
 int canny_low = 10, canny_high = 50;   
 int sobel_scale = 1;
-int min_height = 100, min_width = 100;
+int min_height = 120, min_width = 160;
 int dilate_size = 11;
 
 // 红色色块
@@ -37,8 +37,8 @@ int main()
     uint16_t counterRunBegin = 1;              // 启动计数器：等待摄像头图像帧稳定
 
 	// USB转串口的设备名为 / dev/ttyUSB0
-	// driver = std::make_shared<Driver>("/dev/ttyUSB0", BaudRate::BAUD_115200);
-	driver = std::make_shared<Driver>("/dev/ttyACM0", BaudRate::BAUD_115200);
+	driver = std::make_shared<Driver>("/dev/ttyUSB0", BaudRate::BAUD_115200);
+	// driver = std::make_shared<Driver>("/dev/ttyACM0", BaudRate::BAUD_115200);
 	if (driver == nullptr)
 	{
 		std::cout << "Create uart-driver error!" << std::endl;
@@ -73,15 +73,6 @@ int main()
 	std::cout << "Camera Param: frame rate = " << rate << " width = " << width
 			  << " height = " << height << " exposure = " << exposure << " ms" << std::endl;
 
-    cv::namedWindow("Detected Rectangles");
-    // 创建滑块
-    cv::createTrackbar("Type", "Detected Rectangles", &type, 2);
-    cv::createTrackbar("Min Height", "Detected Rectangles", &min_height, ROWSIMAGE);
-    cv::createTrackbar("Min Width", "Detected Rectangles", &min_width, COLSIMAGE);
-    cv::createTrackbar("Canny Low", "Detected Rectangles", &canny_low, 255);
-    cv::createTrackbar("Canny High", "Detected Rectangles", &canny_high, 255);
-    cv::createTrackbar("Sobel Scale", "Detected Rectangles", &sobel_scale, 100);
-    cv::createTrackbar("Dilate Size", "Detected Rectangles", &dilate_size, 30);
 	while (1)
 	{
 		std::vector<cv::Point> points_red;
@@ -92,6 +83,25 @@ int main()
 			std::cout << "no video frame" << std::endl;
 			continue;
 		}
+		cv::Mat mask_red;
+		std::vector<cv::Rect> coneRects_red = searchBlocks(frame, mask_red, lowerThreshold_r, upperThreshold_r);
+		for(const auto& rect : coneRects_red)
+		{
+			if(rect.height > min_size && rect.height < max_size && rect.width > min_size && rect.width < max_size)
+			{
+				points_red.push_back(cv::Point(rect.x + rect.width / 2, rect.y + rect.height / 2));
+				cv::rectangle(frame, rect, cv::Scalar(0, 0, 255), 2);
+			}
+		}
+		if(points_red.size() == 1)
+		{
+			std::cout << "red point: " << "(" << points_red[0].x << ", " << points_red[0].y << ")  ";
+
+			driver->circleControl(points_red[0].x, points_red[0].y);
+		}
+		else
+			driver->circleControl(0, 0);
+
 
 		// 转换为灰度图像
 		cv::Mat grayImage;
@@ -170,65 +180,26 @@ int main()
 					rectPoints.push_back(approx[2]);
 					rectPoints.push_back(approx[3]);
 					rectPoints.push_back(cv::Point(centerX, centerY));
-					// driver->rectControl(rectPoints);
+					driver->rectControl(rectPoints);
 				}
 			}
 		}
 
-		cv::Mat mask_red;
-		std::vector<cv::Rect> coneRects_red = searchBlocks(frame, mask_red, lowerThreshold_r, upperThreshold_r);
-		for(const auto& rect : coneRects_red)
-		{
-			if(rect.height > min_size && rect.height < max_size && rect.width > min_size && rect.width < max_size)
-			{
-				points_red.push_back(cv::Point(rect.x + rect.width / 2, rect.y + rect.height / 2));
-				cv::rectangle(frame, rect, cv::Scalar(0, 0, 255), 2);
-			}
-		}
-		if(points_red.size() == 1)
-		{
-			std::cout << "red point: " << "(" << points_red[0].x << ", " << points_red[0].y << ")  ";
 
-			driver->circleControl(points_red[0].x, points_red[0].y);
-		}
-		else
-			driver->circleControl(0, 0);
-
-		// 显示结果
+        // // 创建一个空白图像作为左右两幅图像的间隔
+        // cv::Mat blank = cv::Mat::zeros(frame.rows, 10, CV_8UC3);
+        // // 将滑动条和frame图像水平拼接
+        // cv::Mat combined1;
+        // cv::hconcat(frame, blank, combined1);
         // // 将 edges 转换为3通道图像
         // cv::Mat edges_color;
         // cv::cvtColor(edges, edges_color, cv::COLOR_GRAY2BGR);
-
         // // 将combined1和edges图像水平拼接
-        // cv::Mat combined;
-        // cv::hconcat(frame, edges_color, combined);
-
-        // 创建一个空白图像作为左右两幅图像的间隔
-        cv::Mat blank = cv::Mat::zeros(frame.rows, 10, CV_8UC3);
-
-        // 将滑动条和frame图像水平拼接
-        cv::Mat combined1;
-        cv::hconcat(frame, blank, combined1);
-
-        // 将 edges 转换为3通道图像
-        cv::Mat edges_color;
-        cv::cvtColor(edges, edges_color, cv::COLOR_GRAY2BGR);
-
-        // 将combined1和edges图像水平拼接
-        cv::Mat combined2;
-        cv::hconcat(combined1, edges_color, combined2);
-
-        // 显示结果
-        cv::imshow("Detected Rectangles", combined2);
+        // cv::Mat combined2;
+        // cv::hconcat(combined1, edges_color, combined2);
+        // // 显示结果
+        cv::imshow("Detected Rectangles", frame);
 		if(waitKey(5) == 13) break;
-
-		cv::setTrackbarPos("Type", "Detected Rectangles", type);
-		cv::setTrackbarPos("Canny Low", "Detected Rectangles", canny_low);
-		cv::setTrackbarPos("Canny High", "Detected Rectangles", canny_high);
-		cv::setTrackbarPos("Sobel Scale", "Detected Rectangles", sobel_scale);
-		cv::setTrackbarPos("Min Height", "Detected Rectangles", min_height);
-		cv::setTrackbarPos("Min Width", "Detected Rectangles", min_width);
-		cv::setTrackbarPos("Dilate Size", "Detected Rectangles", dilate_size);
 	}
 
 	return 0;

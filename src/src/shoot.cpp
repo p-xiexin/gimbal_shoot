@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
     capture.set(cv::CAP_PROP_FPS, 30);
     capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
-	capture.set(cv::CAP_PROP_EXPOSURE, 0.015);
+	capture.set(cv::CAP_PROP_EXPOSURE, 0.012);
 	
 	double rate = capture.get(CAP_PROP_FPS);
 	double width = capture.get(CAP_PROP_FRAME_WIDTH);
@@ -58,29 +58,6 @@ int main(int argc, char const *argv[])
 	double exposure = capture.get(CAP_PROP_EXPOSURE);
 	std::cout << "Camera Param: frame rate = " << rate << " width = " << width
 			<< " height = " << height << " exposure = " << exposure << " ms" << std::endl;
-
-
-    cv::namedWindow("Red Threshold Settings");
-    cv::createTrackbar("Low H", "Red Threshold Settings", &r_lowH, 180, onTrackbar);
-    cv::createTrackbar("High H", "Red Threshold Settings", &r_highH, 180, onTrackbar);
-    cv::createTrackbar("Low S", "Red Threshold Settings", &r_lowS, 255, onTrackbar);
-    cv::createTrackbar("High S", "Red Threshold Settings", &r_highS, 255, onTrackbar);
-    cv::createTrackbar("Low V", "Red Threshold Settings", &r_lowV, 255, onTrackbar);
-    cv::createTrackbar("High V", "Red Threshold Settings", &r_highV, 255, onTrackbar);
-
-	cv::namedWindow("Green Threshold Settings");
-    cv::createTrackbar("Low H", "Green Threshold Settings", &g_lowH, 180, onTrackbar);
-    cv::createTrackbar("High H", "Green Threshold Settings", &g_highH, 180, onTrackbar);
-    cv::createTrackbar("Low S", "Green Threshold Settings", &g_lowS, 255, onTrackbar);
-    cv::createTrackbar("High S", "Green Threshold Settings", &g_highS, 255, onTrackbar);
-    cv::createTrackbar("Low V", "Green Threshold Settings", &g_lowV, 255, onTrackbar);
-    cv::createTrackbar("High V", "Green Threshold Settings", &g_highV, 255, onTrackbar);
-
-    cv::namedWindow("Result");
-    cv::createTrackbar("Kernel Size: ", "Result", &kernel_size, 10, onTrackbar);
-    cv::createTrackbar("Min Size: ", "Result", &min_size, 50, onTrackbar);
-    cv::createTrackbar("Max Size: ", "Result", &max_size, 50, onTrackbar);
-
 
 	while (1)
 	{
@@ -139,30 +116,12 @@ int main(int argc, char const *argv[])
 		else 
 			counterRunBegin++;
 
-		putText(frame, "FPS: " + formatDoble2String(detFPS, 2), Point(20, 20), FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 255), 1);                   // 车速
+		putText(frame, "FPS: " + formatDoble2String(detFPS, 2), Point(20, 20), FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 255), 1);
 
 		cv::imshow("Result", frame);
 		cv::imshow("Red Threshold Settings", mask_red);
 		cv::imshow("Green Threshold Settings", mask_green);
 		if(waitKey(5) == 13) break;
-		// 更新滑块显示的当前值
-		cv::setTrackbarPos("Low H", "Red Threshold Settings", r_lowH);
-		cv::setTrackbarPos("Low S", "Red Threshold Settings", r_lowS);
-		cv::setTrackbarPos("Low V", "Red Threshold Settings", r_lowV);
-		cv::setTrackbarPos("High H", "Red Threshold Settings", r_highH);
-		cv::setTrackbarPos("High S", "Red Threshold Settings", r_highS);
-		cv::setTrackbarPos("High V", "Red Threshold Settings", r_highV);
-
-		cv::setTrackbarPos("Low H", "Green  Threshold Settings", g_lowH);
-		cv::setTrackbarPos("Low S", "Green  Threshold Settings", g_lowS);
-		cv::setTrackbarPos("Low V", "Green  Threshold Settings", g_lowV);
-		cv::setTrackbarPos("High H", "Green  Threshold Settings", g_highH);
-		cv::setTrackbarPos("High S", "Green  Threshold Settings", g_highS);
-		cv::setTrackbarPos("High V", "Green  Threshold Settings", g_highV);
-
-		cv::setTrackbarPos("Kernel Size: ", "Result", kernel_size);
-		cv::setTrackbarPos("Min Size: ", "Result", min_size);
-		cv::setTrackbarPos("Max Size: ", "Result", max_size);
 	}
 	return 0;
 }
