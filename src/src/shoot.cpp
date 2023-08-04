@@ -11,9 +11,10 @@ using namespace cv;
 std::vector<cv::Rect> searchBlocks(cv::Mat img_rgb, cv::Mat &mask, cv::Scalar lowerThreshold, cv::Scalar upperThreshold);
 void onTrackbar(int, void*);
 
-int kernel_size = 2;
+int kernel_size = 1;
 int min_size = 2;
 int max_size = 30;
+float exposure = 0.008;
 // 红色色块
 int r_lowH = 140, r_lowS = 0, r_lowV = 132;
 int r_highH = 180, r_highS = 255, r_highV = 255;
@@ -50,7 +51,7 @@ int main(int argc, char const *argv[])
     capture.set(cv::CAP_PROP_FPS, 30);
     capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
-	capture.set(cv::CAP_PROP_EXPOSURE, 0.012);
+	capture.set(cv::CAP_PROP_EXPOSURE, exposure);
 	
 	double rate = capture.get(CAP_PROP_FPS);
 	double width = capture.get(CAP_PROP_FRAME_WIDTH);
@@ -119,8 +120,8 @@ int main(int argc, char const *argv[])
 		putText(frame, "FPS: " + formatDoble2String(detFPS, 2), Point(20, 20), FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 255), 1);
 
 		cv::imshow("Result", frame);
-		cv::imshow("Red Threshold Settings", mask_red);
-		cv::imshow("Green Threshold Settings", mask_green);
+		// cv::imshow("Red Threshold Settings", mask_red);
+		// cv::imshow("Green Threshold Settings", mask_green);
 		if(waitKey(5) == 13) break;
 	}
 	return 0;

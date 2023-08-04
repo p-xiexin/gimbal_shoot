@@ -13,6 +13,7 @@ void onTrackbar(int, void*);
 int kernel_size = 2;
 int min_size = 2;
 int max_size = 30;
+float exposure = 0.008;
 // 红色色块
 int r_lowH = 140, r_lowS = 0, r_lowV = 132;
 int r_highH = 180, r_highS = 255, r_highV = 255;
@@ -37,7 +38,7 @@ int main(int argc, char const *argv[])
     capture.set(cv::CAP_PROP_FPS, 30);
     capture.set(cv::CAP_PROP_FRAME_WIDTH, COLSIMAGE);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, ROWSIMAGE);
-	capture.set(cv::CAP_PROP_EXPOSURE, 0.01);
+	capture.set(cv::CAP_PROP_EXPOSURE, exposure);
 	
 	double rate = capture.get(CAP_PROP_FPS);
 	double width = capture.get(CAP_PROP_FRAME_WIDTH);
@@ -115,7 +116,16 @@ int main(int argc, char const *argv[])
 			std::cout << "(" << points_red[0].x << ", " << points_red[0].y << ")  ";
 			std::cout << "(" << points_green[0].x << ", " << points_green[0].y << ")  ";
 			std::cout << "X_Delta: " << delta_x << "  Y_Delta: " << delta_y << std::endl;
-
+			circle(frame, Point(50, 40), 8, Scalar(0, 0, 255), -1);
+			circle(frame, Point(80, 40), 8, Scalar(0, 255, 0), -1);
+		}
+		else if(points_red.size() == 1)
+		{
+			circle(frame, Point(50, 40), 8, Scalar(0, 0, 255), -1);
+		}
+		else if(points_green.size() == 1)
+		{
+			circle(frame, Point(80, 40), 8, Scalar(0, 255, 0), -1);
 		}
 
 		putText(frame, "FPS: " + formatDoble2String(detFPS, 2), Point(20, 20), FONT_HERSHEY_PLAIN, 2, Scalar(0, 0, 255), 1);                   // 车速
